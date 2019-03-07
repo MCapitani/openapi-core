@@ -1,8 +1,9 @@
 """OpenAPI core schemas util module"""
+from base64 import b64decode
 import datetime
 from distutils.util import strtobool
 from json import dumps
-from six import string_types
+from six import string_types, text_type
 import strict_rfc3339
 
 
@@ -24,3 +25,7 @@ def format_date(value):
 def format_datetime(value):
     timestamp = strict_rfc3339.rfc3339_to_timestamp(value)
     return datetime.datetime.utcfromtimestamp(timestamp)
+
+
+def format_byte(value, encoding='utf8'):
+    return text_type(b64decode(value), encoding)
