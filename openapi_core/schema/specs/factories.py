@@ -28,13 +28,17 @@ class SpecFactory(object):
         servers_spec = spec_dict_deref.get('servers', [])
         paths = spec_dict_deref.get('paths', {})
         components_spec = spec_dict_deref.get('components', {})
+        security_spec = spec_dict_deref.get('security', {})
+        security = self._generate_security(security_spec)
 
         info = self.info_factory.create(info_spec)
         servers = self.servers_generator.generate(servers_spec)
         paths = self.paths_generator.generate(paths)
         components = self.components_factory.create(components_spec)
         spec = Spec(
-            info, list(paths), servers=list(servers), components=components)
+            info, list(paths), servers=list(servers),
+            components=components, security=list(security)
+        )
         return spec
 
     @property
@@ -61,3 +65,6 @@ class SpecFactory(object):
     @lru_cache()
     def components_factory(self):
         return ComponentsFactory(self.dereferencer, self.schemas_registry)
+
+    def _generate_security(self, security_spec):
+        return security_spec
