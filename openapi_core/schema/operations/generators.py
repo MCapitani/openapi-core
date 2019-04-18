@@ -32,6 +32,8 @@ class OperationsGenerator(object):
                 parameters_list)
             operation_id = operation_deref.get('operationId')
             tags_list = operation_deref.get('tags', [])
+            security = operation_deref.get('security', None)
+            # None to signal missing value
 
             request_body = None
             if 'requestBody' in operation_deref:
@@ -44,7 +46,8 @@ class OperationsGenerator(object):
                 Operation(
                     http_method, path_name, responses, list(parameters),
                     request_body=request_body, deprecated=deprecated,
-                    operation_id=operation_id, tags=list(tags_list)
+                    operation_id=operation_id, tags=list(tags_list),
+                    security=list(security) if security is not None else None
                 ),
             )
 

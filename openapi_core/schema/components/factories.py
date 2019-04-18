@@ -1,6 +1,7 @@
 from openapi_core.compat import lru_cache
 from openapi_core.schema.components.models import Components
 from openapi_core.schema.schemas.generators import SchemasGenerator
+from openapi_core.schema.security_schemes.factories import SecuritySchemesGenerator
 
 
 class ComponentsFactory(object):
@@ -16,20 +17,27 @@ class ComponentsFactory(object):
         responses_spec = components_deref.get('responses', {})
         parameters_spec = components_deref.get('parameters', {})
         request_bodies_spec = components_deref.get('request_bodies', {})
+        security_schemes_spec = components_deref.get('securitySchemes', {})
 
         schemas = self.schemas_generator.generate(schemas_spec)
         responses = self._generate_response(responses_spec)
         parameters = self._generate_parameters(parameters_spec)
         request_bodies = self._generate_request_bodies(request_bodies_spec)
+        security_schemes = self.security_schemes_generator.generate(security_schemes_spec)
         return Components(
             schemas=list(schemas), responses=responses, parameters=parameters,
-            request_bodies=request_bodies,
+            request_bodies=request_bodies, security_schemes=dict(security_schemes)
         )
 
     @property
     @lru_cache()
     def schemas_generator(self):
         return SchemasGenerator(self.dereferencer, self.schemas_registry)
+
+    @property
+    @lru_cache()
+    def security_schemes_generator(self):
+        return SecuritySchemesGenerator(self.dereferencer, self.schemas_registry)
 
     def _generate_response(self, responses_spec):
         return responses_spec

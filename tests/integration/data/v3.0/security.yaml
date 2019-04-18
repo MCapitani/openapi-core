@@ -1,0 +1,37 @@
+openapi: "3.0.0"
+info:
+  title: Minimal OpenAPI specification w/ security
+  version: "0.1"
+security:
+  - key1: []
+paths:
+  /status:
+    get:
+      responses:
+        default:
+          description: Return the API status.
+  /status-secure:
+    get:
+      security:
+        - key2: []
+      responses:
+        default:
+          description: Return the status with different security
+  /status-insecure:
+    get:
+      security: []
+      responses:
+        default:
+          description: Return the status with no security
+
+
+components:
+  securitySchemes:
+    key1:
+      type: apiKey
+      name: key
+      in: header
+    key2:
+      type: apiKey
+      name: key-cookie
+      in: cookie
