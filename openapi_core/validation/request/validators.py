@@ -27,23 +27,26 @@ class RequestValidator(object):
         )
 
         try:
+            path = self.spec[operation_pattern]
             operation = self.spec.get_operation(
                 operation_pattern, request.method)
         # don't process if operation errors
         except OpenAPIMappingError as exc:
             return RequestValidationResult([exc, ], None, None)
 
-        params, params_errors = self._get_parameters(request, operation)
+        params, params_errors = self._get_parameters(request, operation, path)
         body, body_errors = self._get_body(request, operation)
 
         errors = params_errors + body_errors
         return RequestValidationResult(errors, body, params)
 
-    def _get_parameters(self, request, operation):
+    def _get_parameters(self, request, operation, path):
         errors = []
 
         parameters = RequestParameters()
-        for param_name, param in iteritems(operation.parameters):
+        param_spec_dict = dict(path.parameters)
+        param_spec_dict.update(operation.parameters)
+        for param_name, param in iteritems(param_spec_dict):
             try:
                 raw_value = param.get_value(request)
             except MissingParameter:
